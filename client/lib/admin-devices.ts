@@ -89,10 +89,15 @@ export async function uploadAdminDeviceImage(id: string, file: File) {
   });
   if (uploadError) throw uploadError;
 
-  const { error: updateError } = await supabase.from("devices").update({ image_url: path }).eq("id", id);
-  if (updateError) {
+  const { data: updatedDevice, error: updateError } = await supabase
+    .from("devices")
+    .update({ image_url: path })
+    .eq("id", id)
+    .select("id,image_url")
+    .single();
+  if (updateError || updatedDevice?.id !== id || updatedDevice?.image_url !== path) {
     await supabase.storage.from(DEVICE_IMAGE_BUCKET).remove([path]);
-    throw updateError;
+    throw updateError ?? new Error("The image uploaded, but its device record was not updated.");
   }
 
   if (oldPaths.length > 0) {

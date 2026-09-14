@@ -34,8 +34,14 @@ type AvailableDeviceRecord = {
   image_url: string | null;
 };
 
-const fallbackDeviceImage = vendorDevices[0].image;
+const neutralDevicePlaceholder = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><rect width="640" height="400" fill="#f1f4f6"/><rect x="190" y="105" width="260" height="160" rx="12" fill="#d8e0e7"/><rect x="208" y="123" width="224" height="112" rx="5" fill="#eef2f5"/><path d="M140 285h360l-28 22H168z" fill="#b6c2cc"/></svg>')}`;
 
+
+async function getAvailableDeviceImage(imagePath: string | null) {
+  if (!imagePath) return neutralDevicePlaceholder;
+  const publicUrl = supabase.storage.from("device-images").getPublicUrl(imagePath).data.publicUrl;
+  return publicUrl || neutralDevicePlaceholder;
+=======
 function getAvailableDeviceImage(imageUrl: string | null) {
   if (!imageUrl) return fallbackDeviceImage;
   if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
@@ -44,6 +50,7 @@ function getAvailableDeviceImage(imageUrl: string | null) {
     .from("device-images")
     .getPublicUrl(imageUrl)
     .data.publicUrl;
+ main
 }
 
 async function listAvailableDevices(): Promise<VendorDevice[]> {
@@ -58,7 +65,11 @@ async function listAvailableDevices(): Promise<VendorDevice[]> {
     id: device.id,
     name: device.name,
     model: device.model,
+
+    image: await getAvailableDeviceImage(device.image_url).catch(() => neutralDevicePlaceholder),
+=======
     image: getAvailableDeviceImage(device.image_url),
+
     imageAlt: `${device.name} device`,
     price: device.amount,
     currency: "USD",
