@@ -25,8 +25,13 @@ async function requireAdminSession() {
 
 async function getDeviceImageUrl(path: string | null) {
   if (!path) return null;
-  const { data, error } = await supabase.storage.from(DEVICE_IMAGE_BUCKET).createSignedUrl(path, 3600);
-  return error ? null : data.signedUrl;
+
+  const { data } = supabase.storage
+    .from(DEVICE_IMAGE_BUCKET)
+    .getPublicUrl(path);
+
+  return data.publicUrl;
+}
 }
 
 async function withImageUrl(device: DeviceRecord): Promise<AdminDevice> {
