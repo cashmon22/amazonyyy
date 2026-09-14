@@ -38,8 +38,8 @@ const neutralDevicePlaceholder = `data:image/svg+xml,${encodeURIComponent('<svg 
 
 async function getAvailableDeviceImage(imagePath: string | null) {
   if (!imagePath) return neutralDevicePlaceholder;
-  const { data, error } = await supabase.storage.from("device-images").createSignedUrl(imagePath, 3600);
-  return error || !data?.signedUrl ? neutralDevicePlaceholder : data.signedUrl;
+  const publicUrl = supabase.storage.from("device-images").getPublicUrl(imagePath).data.publicUrl;
+  return publicUrl || neutralDevicePlaceholder;
 }
 
 async function listAvailableDevices(): Promise<VendorDevice[]> {
