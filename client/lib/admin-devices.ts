@@ -32,7 +32,7 @@ async function getDeviceImageUrl(path: string | null) {
 
   return data.publicUrl;
 }
-}
+
 
 async function withImageUrl(device: DeviceRecord): Promise<AdminDevice> {
   const { image_url, ...deviceFields } = device;
