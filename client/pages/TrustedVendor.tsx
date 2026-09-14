@@ -41,7 +41,7 @@ async function getAvailableDeviceImage(imagePath: string | null) {
   if (!imagePath) return neutralDevicePlaceholder;
   const publicUrl = supabase.storage.from("device-images").getPublicUrl(imagePath).data.publicUrl;
   return publicUrl || neutralDevicePlaceholder;
-=======
+
 function getAvailableDeviceImage(imageUrl: string | null) {
   if (!imageUrl) return fallbackDeviceImage;
   if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
@@ -67,7 +67,7 @@ async function listAvailableDevices(): Promise<VendorDevice[]> {
     model: device.model,
 
     image: await getAvailableDeviceImage(device.image_url).catch(() => neutralDevicePlaceholder),
-=======
+
     image: getAvailableDeviceImage(device.image_url),
 
     imageAlt: `${device.name} device`,
